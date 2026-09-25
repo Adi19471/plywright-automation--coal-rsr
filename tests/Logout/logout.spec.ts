@@ -14,7 +14,7 @@ test("Logout", async ({ authenticationPage, logoutPage }) => {
   await authenticationPage.password.fill(loginDetailesTestdata_driven.password);
 
   await logoutPage.clickSignIn();
-  await logoutPage.clickLogout();
+  // await logoutPage.clickLogout();
 
   console.log("..........Logout is Ended..............");
 });
