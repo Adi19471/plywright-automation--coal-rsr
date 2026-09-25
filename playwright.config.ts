@@ -2,17 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 import chalk from "chalk";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
+
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 
-// TEST_ENV picks which .env.<name> file to load (local | uat | beta | production).
-// Falls back to plain .env if that file doesn't exist, so the previous behavior
-// (a single untracked .env) still works for anyone who hasn't switched over.
+
 const envName = process.env.TEST_ENV ?? "local";
 const envFile = path.resolve(__dirname, `.env.${envName}`);
 dotenv.config({ path: fs.existsSync(envFile) ? envFile : path.resolve(__dirname, ".env") });
@@ -30,8 +25,13 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Opt out of parallel tests on CI. Locally cap at 2 — the shared RSR test
+   * server (10.99.99.57) can't serve 6 browsers at once: pages load too slowly
+   * for assertions and login returns "Network error". */
+  workers: process.env.CI ? 1 : 2,
+
+  /* The RSR screens load their data slowly; 5s default is too tight. */
+  expect: { timeout: 15_000 },
 
   /* Per-test timeout. Raised above the 30s default because slowMo (below) adds
    * ~1s to every action, and the Wagons flow alone runs a dozen+ actions. */
@@ -49,9 +49,7 @@ export default defineConfig({
       "html",
       {
         outputFolder: "playwright-report",
-        // Auto-open the report when a local run has failures, so you land
-        // straight on the failing test instead of hunting for the folder.
-        // CI never opens one — there's no display for a browser to open on.
+
         open: process.env.CI ? "never" : "on-failure",
       },
     ],
@@ -130,41 +128,7 @@ export default defineConfig({
       dependencies: ["setup"],
     },
 
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+  
   ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });

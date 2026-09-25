@@ -9,6 +9,24 @@ import { test as base, expect } from "@playwright/test";
 import { TankerPage } from "../pages/Admin/Tanker";
 import {LocationPage} from "../pages/Admin/Location"
 
+import { PartyPage } from "../pages/Admin/Party";
+
+import { SublocationPage } from "../pages/Admin/Sublocation";
+
+import { SubsiteryMasterPage } from "../pages/Admin/SubsiteryMaster";
+
+import { BerthMasterPage } from "../pages/Admin/BerthMaster";
+
+import { EquipmentPage } from "../pages/Admin/Equipment";
+
+import { MachineryPage } from "../pages/Admin/Machinery";
+
+import { UsersPage } from "../pages/Admin/Users";
+
+import { DashboardPage } from "../pages/Dashboard/Dashboard";
+
+import { LogoutPage } from "../pages/logout/Logout";
+
 import fs from "fs";
 
 type MyFixtures = {
@@ -18,6 +36,15 @@ type MyFixtures = {
   sidingPage:SidingPage;
   tankerPage:TankerPage;
   locationPage:LocationPage;
+  partyPage:PartyPage;
+  sublocationPage:SublocationPage;
+  subsiteryMasterPage:SubsiteryMasterPage;
+  berthMasterPage:BerthMasterPage;
+  equipmentPage:EquipmentPage;
+  machineryPage:MachineryPage;
+  usersPage:UsersPage;
+  dashboardPage:DashboardPage;
+  logoutPage:LogoutPage;
 };
 
 // The app stores its auth token in sessionStorage, which storageState()
@@ -29,13 +56,8 @@ const sessionStorageFile = "playwright/.auth/session-storage.json";
 
 export const test = base.extend<MyFixtures>({
   context: async ({ context, storageState }, use) => {
-    // Only restore the saved session for tests that explicitly point at the
-    // auth file (the "chromium" project's default `storageState` string).
-    // Skip it for the "setup" project (storageState is unset — a stale token
-    // pre-seeded before a fresh login makes the app skip straight to the
-    // dashboard and never render the login form) and for tests that opt into
-    // starting logged out via an inline object override, e.g.
-    // AuthenticationTest.spec.ts's `storageState: { cookies: [], origins: [] }`.
+  
+    
     const usesSavedAuthFile = typeof storageState === "string";
 
     if (usesSavedAuthFile && fs.existsSync(sessionStorageFile)) {
@@ -73,6 +95,42 @@ export const test = base.extend<MyFixtures>({
   locationPage:async({page},use) =>{
 const locationPage = await use(new LocationPage(page))
   },
+
+  partyPage:async({page},use) =>{
+const partyPage = await use(new PartyPage(page))
+  },
+
+  sublocationPage:async({page},use) =>{
+    await use(new SublocationPage(page))
+  },
+
+  subsiteryMasterPage:async({page},use) =>{
+    await use(new SubsiteryMasterPage(page))
+  },
+
+  berthMasterPage:async({page},use) =>{
+    await use(new BerthMasterPage(page))
+  },
+
+  equipmentPage:async({page},use) =>{
+    await use(new EquipmentPage(page))
+  },
+
+  machineryPage:async({page},use) =>{
+    await use(new MachineryPage(page))
+  },
+
+  usersPage:async({page},use) =>{
+    await use(new UsersPage(page))
+  },
+
+  dashboardPage:async({page},use) =>{
+    await use(new DashboardPage(page))
+  },
+
+  logoutPage:async({page},use) =>{
+    await use(new LogoutPage(page))
+  }
 });
 
 export { expect };

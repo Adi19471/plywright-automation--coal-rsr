@@ -20,6 +20,9 @@ export class Wagons {
   readonly wagonsbuttonsave: Locator;
   readonly backbuttonclick :Locator;
 
+
+  
+
   constructor(page: Page) {
     this.page = page;
 
@@ -87,10 +90,7 @@ export class Wagons {
         .click();
     }
 
-    // The app shows a "created successfully" toast and closes the dialog
-    // even when the save actually failed server-side (e.g. a duplicate
-    // description), so the save response itself has to be checked rather
-    // than trusting the dialog closing.
+
     const [saveResponse] = await Promise.all([
       this.page.waitForResponse((res) => res.url().includes("/adminScreens/saveWagon")),
       this.wagonsbuttonsave.first().click(),
